@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CBR Management SIA — Vadības, zinātniskā un tehniskā konsultēšana</title>
+  <meta name="description" content="CBR Management SIA Rīgā sniedz vadības, zinātniskās un tehniskās konsultācijas: stratēģija un OKR, procesu digitalizācija un BPMN, datu analītika lēmumiem." />
+  <meta name="color-scheme" content="dark light" />
+  <style>
+    :root{
+      /* TUMŠAIS FONS + PIENA TEKSTS */
+      --bg:#0e1117;
+      --bg-soft:#151924;
+      --card:#111521;
+      --ink:#f5efe6;            /* “piens” – patīkams silti balts tonis */
+      --muted:#d7d2c7;          /* maigāks piens palīdz tekstiem palīgrindā */
+      --ink-weak:#bdb6ab;
+      --brand:#f0ad32;
+      --brand-2:#ffe2a2;
+      --accent:#2f89fc;
+      --ok:#18c37d;
+      --error:#ff5a7a;
+      --ring:0 0 0 3px rgba(255,226,162,.35);
+      --radius:18px;
+      --shadow:0 12px 34px rgba(0,0,0,.35);
+      --shadow-soft:0 8px 26px rgba(0,0,0,.25);
+
+      /* FORMAS KONTRASTS — gaišāki lauki, skaidras robežas */
+      --field-bg:#171b26;
+      --field-border:#f5efe61f; /* pienkrāsas robeža */
+      --field-border-strong:#ffe2a252;
+      --placeholder:#f5efe680;  /* gaišs, bet atšķirams */
+    }
+
+    /* RESET MINIMUM */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(255,226,162,.06), transparent),
+        radial-gradient(900px 400px at 120% 10%, rgba(47,137,252,.08), transparent),
+        var(--bg);
+      color:var(--ink);
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    a{color:inherit; text-decoration:none}
+    img{max-width:100%; display:block}
+    h1,h2,h3{line-height:1.2; margin:0 0 .5rem}
+    p{margin:.2rem 0 .9rem}
+    section{scroll-margin-top:92px}
+
+    /* TOP NAV */
+    .nav{
+      position:sticky; top:0; z-index:50; backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(17,21,33,.88), rgba(17,21,33,.66));
+      border-bottom:1px solid var(--field-border);
+    }
+    .nav-inner{max-width:1100px; margin:0 auto; padding:.8rem 1rem; display:flex; align-items:center; gap:1rem;}
+    .logo{display:flex; align-items:center; gap:.7rem; font-weight:700; letter-spacing:.4px}
+    .logo-badge{
+      width:34px; height:34px; border-radius:12px; display:grid; place-items:center;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color:#181b23; font-weight:900; box-shadow: var(--shadow-soft);
+    }
+    .nav ul{list-style:none; display:flex; gap:1rem; padding:0; margin:0 auto}
+    .nav a{
+      display:inline-flex; align-items:center; gap:.4rem;
+      padding:.55rem .8rem; border-radius:10px; color:var(--ink-weak);
+    }
+    .nav a:hover,.nav a:focus{color:var(--ink); background:rgba(255,255,255,.06); outline:none}
+    .cta{margin-left:auto; display:flex; gap:.6rem;}
+    .btn{
+      border:0; border-radius:12px; padding:.7rem 1rem; font-weight:700; cursor:pointer;
+      transition:.2s transform ease, .2s background ease, .2s box-shadow ease;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2)); color:#1a1d24;
+      box-shadow: var(--shadow-soft);
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-ghost{
+      background:transparent; color:var(--ink); border:1px solid var(--field-border)
+    }
+    .btn-ghost:hover{background:rgba(255,255,255,.06)}
+
+    /* HERO */
+    .hero{
+      position:relative; min-height:84vh; display:grid; place-items:center; overflow:hidden;
+      border-bottom:1px solid var(--field-border);
+    }
+    .hero::before{
+      content:""; position:absolute; inset:0;
+      background-image:url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1950&q=80');
+      background-size:cover; background-position:center;
+      filter:brightness(.50) saturate(1.1) contrast(1.05);
+      transform:scale(1.02);
+    }
+    .hero::after{
+      content:""; position:absolute; inset:0;
+      background:
+        radial-gradient(900px 360px at 70% 15%, rgba(47,137,252,.22), transparent),
+        radial-gradient(1000px 420px at 10% 80%, rgba(240,173,50,.20), transparent);
+      mix-blend:screen;
+    }
+    .hero-content{
+      position:relative; z-index:1; max-width:1100px; padding:5rem 1rem 4rem; text-align:left;
+      display:grid; grid-template-columns:1.1fr .9fr; gap:2rem; align-items:center;
+    }
+    .hero h1{font-size:clamp(32px, 5vw, 54px)}
+    .lead{font-size:clamp(16px, 2.2vw, 20px); color:var(--muted)}
+    .hero-card{
+      background:linear-gradient(180deg, rgba(17,21,33,.86), rgba(17,21,33,.72));
+      border:1px solid var(--field-border); padding:1.2rem; border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .hero-points{display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1rem}
+    .chip{display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .6rem; background:rgba(255,255,255,.10); border-radius:24px; color:var(--ink); font-size:.92rem}
+
+    /* CONTAINER & CARDS */
+    .wrap{max-width:1100px; margin:0 auto; padding:4rem 1rem}
+    .sub{color:var(--brand-2); text-transform:uppercase; letter-spacing:.18em; font-weight:800; margin-bottom:.4rem}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem}
+    .grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:1.2rem}
+    .card{
+      background:linear-gradient(180deg, rgba(21,25,36,.90), rgba(17,21,33,.88));
+      border:1px solid var(--field-border); padding:1.2rem; border-radius:var(--radius); box-shadow:var(--shadow-soft)
+    }
+    .card h3{margin-bottom:.2rem}
+    .icon{
+      width:40px; height:40px; border-radius:12px; display:grid; place-items:center; margin-bottom:.6rem;
+      background:linear-gradient(135deg, rgba(240,173,50,.16), rgba(47,137,252,.22)); border:1px solid var(--field-border);
+      color:var(--ink);
+    }
+    .muted{color:var(--muted)}
+
+    /* TIMELINE / PROCESS */
+    .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem}
+    .step{position:relative; padding-top:.6rem}
+    .step::before{
+      content:""; position:absolute; top:20px; left:-12px; right:-12px; height:2px;
+      background:linear-gradient(90deg, rgba(240,173,50,.55), rgba(47,137,252,.55));
+    }
+    .step:first-child::before{left:50%}
+    .step:last-child::before{right:50%}
+
+    /* FOOTER */
+    .footer{border-top:1px solid var(--field-border); background:linear-gradient(180deg, rgba(17,21,33,.88), rgba(17,21,33,.96))}
+    .footer small{color:var(--ink-weak)}
+    address{font-style:normal}
+
+    /* MODALS */
+    .modal{
+      position:fixed; inset:0; display:none; place-items:center; padding:1rem;
+      background:rgba(8,10,14,.65); backdrop-filter: blur(10px);
+    }
+    .modal[open]{display:grid}
+    .modal-card{
+      width:min(560px, 96vw); background:var(--card); border:1px solid var(--field-border);
+      border-radius:var(--radius); box-shadow:var(--shadow); padding:1rem 1rem 1.2rem; color:var(--ink);
+    }
+    .modal-header{display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.6rem}
+    .x{background:transparent; border:0; color:var(--ink-weak); font-size:22px; cursor:pointer}
+    .x:hover{color:var(--ink)}
+
+    /* FORM — KONTRASTS PIEAUG */
+    form{display:grid; gap:1rem}
+    label{display:block; font-weight:800; font-size:1rem; color:var(--ink)}
+    .required::after{content:" *"; color:var(--brand-2)}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
+
+    input, textarea{
+      width:100%; background:var(--field-bg); color:var(--ink);
+      border:1px solid var(--field-border); border-radius:14px; padding:1rem 1rem; font:inherit;
+      box-shadow: inset 0 0 0 transparent;
+    }
+    input::placeholder, textarea::placeholder{color:var(--placeholder)}
+    input:focus,textarea:focus{outline:none; box-shadow: var(--ring); border-color: var(--field-border-strong)}
+    textarea{min-height:140px; resize:vertical}
+    .helper{font-size:.95rem; color:var(--ink-weak)}
+
+    .notice{
+      display:flex; gap:.6rem; background:rgba(24,195,125,.14); border:1px solid rgba(24,195,125,.42); color:var(--ink);
+      padding:.7rem .8rem; border-radius:12px;
+    }
+    .hidden{display:none}
+
+    /* ANIMATIONS */
+    .fade-in{animation:fade .6s ease both}
+    @keyframes fade{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+
+    /* RESPONSIVE */
+    @media (max-width:920px){
+      .hero-content{grid-template-columns:1fr}
+      .grid-3{grid-template-columns:1fr}
+      .grid-2{grid-template-columns:1fr}
+      .steps{grid-template-columns:1fr}
+      .step::before{display:none}
+      .nav ul{display:none}
+      .cta{margin-left:0}
+    }
+  </style>
+</head>
+<body>
+  <!-- ======= NAVIGĀCIJA ======= -->
+  <header class="nav" role="navigation" aria-label="Galvenā navigācija">
+    <div class="nav-inner">
+      <a class="logo" href="#sakums" aria-label="CBR Management SIA uz sākumu">
+        <span class="logo-badge">CBR</span>
+        <span>Management SIA</span>
+      </a>
+
+      <ul>
+        <li><a href="#sakums">Sākums</a></li>
+        <li><a href="#par-mums">Par mums</a></li>
+        <li><a href="#pakalpojumi">Pakalpojumi</a></li>
+        <li><a href="#kapeccbr">Kāpēc CBR</a></li>
+        <li><a href="#misija">Misija</a></li>
+        <li><a href="#kontakti">Kontakti</a></li>
+      </ul>
+
+      <div class="cta" role="group" aria-label="Ātrās darbības">
+        <button class="btn-ghost" data-scroll="#pakalpojumi">Skatīt pakalpojumus</button>
+        <button class="btn" id="open-contact">Nosūtīt ziņu</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======= HERO / SĀKUMS ======= -->
+  <section id="sakums" class="hero" aria-label="Sākuma ekrāns">
+    <div class="hero-content fade-in">
+      <div>
+        <div class="sub">Padomi, kas maina rezultātu</div>
+        <h1>CBR Management SIA — vadības, zinātniskā un tehniskā konsultēšana</h1>
+        <p class="lead">
+          Palīdzam Baltijas un starptautiskiem uzņēmumiem ieviest veiklus mērījumu
+          ietvarus, pārvērst datus lēmumos un sakārtot digitālos procesus, lai
+          izaugsme būtu stabila bez liekas slodzes.
+        </p>
+        <div class="hero-points">
+          <span class="chip" aria-label="ISO chip">Kvalitātes disciplīna</span>
+          <span class="chip" aria-label="Data chip">Datu vadīta prakse</span>
+          <span class="chip" aria-label="Agile chip">Agilitāte lēmumos</span>
+          <span class="chip" aria-label="Ethics chip">Privātums vispirms</span>
+        </div>
+      </div>
+
+      <aside class="hero-card" aria-label="Ātrais kopsavilkums">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2l2.2 5.6L20 10l-5.8 2.4L12 18l-2.2-5.6L4 10l5.8-2.4L12 2z"/></svg>
+        </div>
+        <h3>“Zinātne pārvērsta darbībā.”</h3>
+        <p class="muted">
+          No makro stratēģijas līdz operatīvām kartēm saīsinām ceļu ar OKR disciplīnu,
+          BPMN procesu shēmām un produktu eksperimentiem, kas skaidri rāda ROI.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ======= PAR MUMS ======= -->
+  <section id="par-mums" class="wrap" aria-label="Par mums">
+    <div class="sub">Kas mēs esam</div>
+    <h2>Pragmatiska konsultēšana ar mērāmu ietekmi</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 4h18v2H3zm0 7h18v2H3zm0 7h18v2H3z"/></svg>
+        </div>
+        <p>
+          CBR Management SIA, dibināta Rīgā, piegādā vadības konsultācijas ar
+          zinātnisku balstu. Mēs nesniedzam tikai dokumentus, bet arī gatavus
+          darba rīkus, kurus iespējams lietot jau pēc dažām nedēļām.
+        </p>
+        <p>
+          Mūsu kompetence apvieno analītiku, servisa dizainu un kultūras
+          pārmaiņu vadību. Strādājam līdzās iekšējām komandām, lai zināšanas
+          paliktu pie jums.
+        </p>
+      </div>
+      <div class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 7a5 5 0 100 10A5 5 0 0012 7zm0-5a1 1 0 011 1v2a1 1 0 01-2 0V3a1 1 0 011-1zm0 18a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 11a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm14 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z"/></svg>
+        </div>
+        <p>
+          Darbojamies disciplīnās: <em>Management Consulting</em>, <em>Business Support</em>,
+          un <em>Professional, Scientific & Technical Services</em>. Risinājumus veidojam
+          saskaņā ar datu drošību un mūsdienīgu pieejamību.
+        </p>
+        <p>
+          Ticam nelieliem, bet regulāriem eksperimentiem, kuru rezultātus iespējams mērīt —
+          tā mazinām riskus un palielinām uzticēšanos starp iesaistītajām pusēm.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= PAKALPOJUMI ======= -->
+  <section id="pakalpojumi" class="wrap" aria-label="Pakalpojumi">
+    <div class="sub">Ko darām</div>
+    <h2>Pakalpojumi izaugsmei ar skaidru ROI</h2>
+
+    <div class="grid-3">
+      <article class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M4 4h16v2H4zm0 4h10v2H4zm0 4h16v2H4zm0 4h8v2H4z"/></svg>
+        </div>
+        <h3>Stratēģija & OKR arhitektūra</h3>
+        <p class="muted">
+          Izbūvējam OKR ietvaru, lai mērķi būtu saprotami visā organizācijā.
+          Iestatām mērījumus, kas sasaistās ar ieņēmumu loģiku.
+          Reizi ceturksnī veicam vieglu kalibrēšanu ar pārvaldības minimālu slogu.
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        </div>
+        <h3>Procesu digitalizācija & BPMN</h3>
+        <p class="muted">
+          Pārzīmējam biznesa procesus BPMN kartēs un likvidējam berzi.
+          RPA un API integrācijas iesakām tikai tur, kur ieguvums ir pierādīts.
+          Sagatavojam operatīvās instrukcijas un apmācību materiālus.
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 3l9 4.5-9 4.5L3 7.5 12 3zm0 9l9 4.5-9 4.5L3 16.5 12 12z"/></svg>
+        </div>
+        <h3>Datu analītika lēmumiem</h3>
+        <p class="muted">
+          Savienojam ERP/CRM datus un pārvēršam tos pārvaldības pārskatos.
+          Definējam KPI, kas atspoguļo īstos pārdošanas un izmaksu plūsmas punktus.
+          Izveidojam vizuāli tīras, nepārblīvētas vadības paneles.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ======= KĀPĒC CBR ======= -->
+  <section id="kapeccbr" class="wrap" aria-label="Kāpēc sadarboties ar mums">
+    <div class="sub">Kāpēc tieši mēs</div>
+    <h2>Trīs iemesli, kāpēc klienti paliek</h2>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M9 16.2l-3.5-3.5L4 14.2 9 19l12-12-1.5-1.5z"/></svg>
+        </div>
+        <h3>Pierādāmi rezultāti</h3>
+        <p class="muted">
+          Katram projektam definējam ROI hipotēzi un pēc ieviešanas to izmērām.
+          Nododam vienkāršu salīdzinošu atskaiti — “pirms” un “pēc”.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2l4 7H8l4-7zm0 20l-4-7h8l-4 7z"/></svg>
+        </div>
+        <h3>Zināšanu nodošana</h3>
+        <p class="muted">
+          Strādājam kopā ar jūsu komandu, nevis tās vietā. Atstājam dokumentāciju,
+          piemērus un apmācības, lai risinājums dzīvotu bez ārējās atkarības.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zm1 13H11v-2h2v2zm0-4H11V7h2v5z"/></svg>
+        </div>
+        <h3>Integritāte & privātums</h3>
+        <p class="muted">
+          Skaidri aprakstām datu izmantošanu. Nav slēpto rindiņu — uzticība ir princips,
+          nevis papildinājums. Ievērojam Apple vadlīnijām draudzīgu pieeju.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= MISIJA UN MĒRĶI ======= -->
+  <section id="misija" class="wrap" aria-label="Misija un mērķi">
+    <div class="sub">Kurp dodamies</div>
+    <h2>Misija: tehnoloģija cilvēkiem, nevis otrādi</h2>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 6l-8 4 8 4 8-4-8-4zm0 6l-8 4 8 4 8-4-8-4z"/></svg>
+        </div>
+        <h3>Misija</h3>
+        <p class="muted">
+          “Dot spēju jebkura izmēra uzņēmumiem pieņemt labākus lēmumus ātrāk,
+          neupurējot cilvēcību.” Aizstāvam tehnoloģiju kā atbalsta instrumentu.
+        </p>
+      </div>
+      <div class="card">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M7 10l5 5 5-5H7z"/></svg>
+        </div>
+        <h3>Mērķi</h3>
+        <p class="muted">
+          Piecu gadu laikā izveidot Baltijas konsultantu tīklu ar koplietotu mērāmu praksi.
+          Atvērt piemēru bibliotēku, lai iesākšana būtu ātra un lēta.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= PROCESS (3 soļi) ======= -->
+  <section id="process" class="wrap" aria-label="Process">
+    <div class="sub">Kā strādājam</div>
+    <h2>Process trīs skaidros soļos</h2>
+    <div class="steps">
+      <div class="card step">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 3h18v6H3zM3 11h10v10H3zM15 11h6v10h-6z"/></svg>
+        </div>
+        <h3>1) Izpēte & diagnostika</h3>
+        <p class="muted">
+          Īsas intervijas, datu audits un brieduma novērtējums. Beigās —
+          problēmu karte ar prioritātēm un pārbaudāmiem panākumu kritērijiem.
+        </p>
+      </div>
+      <div class="card step">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M4 4h16v4H4zM6 10h12l-2 10H8z"/></svg>
+        </div>
+        <h3>2) Dizains & eksperimenti</h3>
+        <p class="muted">
+          Nelieli prototipi, 2–4 nedēļu sprinti un definētas metriskas.
+          Sagatavojam BPMN, OKR un lēmumu kanvus operatīvai ieviešanai.
+        </p>
+      </div>
+      <div class="card step">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2l7 7-7 7-7-7 7-7z"/></svg>
+        </div>
+        <h3>3) Ieviešana & nodošana</h3>
+        <p class="muted">
+          Nodrošinām izpildi, apmācības un rokasgrāmatas. Pēc nodošanas
+          piedāvājam atbalstu pēc vajadzības — bez liekām atkarībām.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= FRASES FORMĀ ======= -->
+  <section aria-label="Formas frāzes" class="wrap">
+    <div class="sub">Formas frāzes</div>
+    <h2>Teikumi, kas palīdz precīzi noformulēt vajadzību</h2>
+    <div class="grid-3">
+      <div class="card">
+        <h3>Stratēģijas sākšanai</h3>
+        <p class="muted">“Vēlos īsu konsultāciju par OKR uzstādīšanu un saikni ar ieņēmumiem.”</p>
+      </div>
+      <div class="card">
+        <h3>Par procesiem</h3>
+        <p class="muted">“Lūdzu, pārskatīt iepirkuma procesu BPMN kartē, lai noņemtu kavēšanos un automatizētu soļus.”</p>
+      </div>
+      <div class="card">
+        <h3>Par KPI un datiem</h3>
+        <p class="muted">“Nepieciešami vienkārši vadības paneļi nedēļas lēmumiem — varam definēt būtiskos KPI?”</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= KONTAKTI (TRIGGERS) ======= -->
+  <section id="kontakti" class="wrap" aria-label="Kontakti">
+    <div class="sub">Sazinies</div>
+    <h2>Esam gatavi īsam ievada zvanam — sūti ziņu</h2>
+    <div class="grid-2">
+      <div class="card">
+        <p>
+          Mēs nepieprasām tālruņa numuru; saziņa notiek e-pastā vai tiešsaistes tikšanās
+          formātā. Ievērojam skaidru piekrišanu, datu minimizāciju un neveicam invazīvas
+          prakses — saskaņā ar Apple vadlīnijām.
+        </p>
+        <p class="notice" role="status" aria-live="polite">
+          <span aria-hidden="true">✓</span>
+          <span>Atbildam parasti 1 darba dienas laikā.</span>
+        </p>
+        <div>
+          <button class="btn" id="cta-open">Atvērt formu</button>
+          <button class="btn-ghost" data-scroll="#kapeccbr">Kāpēc CBR?</button>
+        </div>
+      </div>
+
+      <div class="card" role="complementary" aria-label="Privātuma kopsavilkums">
+        <h3>Privātums īsumā</h3>
+        <p class="muted">
+          Tavi dati tiks izmantoti tikai, lai atbildētu uz ziņu. Tālrunis netiek pieprasīts,
+          mārketinga nolūkiem trešajām pusēm datus nenododam. Sūtot formu, tu skaidri
+          piekrīti apstrādei un vari jebkurā brīdī lūgt dzēšanu.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= KĀJENE ======= -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="grid-2">
+        <div>
+          <div class="logo" style="margin-bottom:.6rem">
+            <span class="logo-badge">CBR</span>
+            <span>Management SIA</span>
+          </div>
+          <small>&copy; <span id="year"></span> CBR Management SIA. Visas tiesības aizsargātas.</small>
+        </div>
+        <div>
+          <h3 style="margin:0 0 .4rem">Oficiālie kontakti</h3>
+          <address>
+            <div>Adrese: 5 - 50 Paula Lejiņa iela, LV-1029, Rīga</div>
+            <div>E-pasts: <a href="mailto:krivorucko@cbrmanagementsia.pro" rel="noopener">krivorucko@cbrmanagementsia.pro</a></div>
+          </address>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======= KONTAKTU MODĀLIS ======= -->
+  <dialog class="modal" id="contact-modal" aria-labelledby="modal-title" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Nosūtīt ziņu CBR Management SIA</h3>
+        <button class="x" data-close aria-label="Aizvērt">×</button>
+      </div>
+
+      <!-- Uzlabots kontrasts: piena teksti, gaišāki lauki, spēcīgas etiķetes -->
+      <form id="contact-form" novalidate>
+        <div class="row">
+          <div>
+            <label class="required" for="name">Vārds</label>
+            <input id="name" name="name" autocomplete="name" placeholder="Piemērs: Julija" required />
+            <div class="helper" id="nameHelp">Norādi savu vārdu vai komandas nosaukumu.</div>
+          </div>
+          <div>
+            <label class="required" for="email">E-pasts</label>
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="vards@uznemums.lv" required />
+            <div class="helper">Izmantosim tikai atbildei.</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="company">Uzņēmums (neobligāti)</label>
+          <input id="company" name="company" autocomplete="organization" placeholder="Piemērs: CBR Management SIA" />
+        </div>
+
+        <div>
+          <label class="required" for="message">Ziņa</label>
+          <textarea id="message" name="message" placeholder="Īsumā apraksti mērķi un gaidīto rezultātu…" required></textarea>
+        </div>
+
+        <div>
+          <label style="display:flex; gap:.6rem; align-items:flex-start">
+            <input id="consent" type="checkbox" required aria-describedby="consentHelp" />
+            <span class="required">Piekrītu, ka mana ziņa tiks apstrādāta atbildei saskaņā ar privātuma kopsavilkumu.</span>
+          </label>
+          <div class="helper" id="consentHelp">Tālrunis nav nepieciešams. Vienmēr vari pieprasīt datu dzēšanu.</div>
+        </div>
+
+        <div style="display:flex; gap:.6rem; align-items:center">
+          <button class="btn" type="submit">Nosūtīt</button>
+          <button class="btn-ghost" type="button" data-close>Atcelt</button>
+          <span id="form-state" class="helper" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ======= PANĀKUMU MODĀLIS ======= -->
+  <dialog class="modal" id="success-modal" aria-labelledby="success-title" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="success-title">Ziņa nosūtīta ✅</h3>
+        <button class="x" data-close aria-label="Aizvērt">×</button>
+      </div>
+      <p class="muted">
+        Paldies! Apstiprinājumu drīz nosūtīsim uz tavu e-pastu. Ja 24 stundu laikā nesaņem atbildi,
+        droši raksti uz <a href="mailto:krivorucko@cbrmanagementsia.pro">krivorucko@cbrmanagementsia.pro</a>.
+      </p>
+      <div style="display:flex; gap:.6rem">
+        <button class="btn" data-close>Skaidrs</button>
+        <button class="btn-ghost" data-scroll="#pakalpojumi" data-close>Skatīt pakalpojumus</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ======= SCRIPTS ======= -->
+  <script>
+    // Gluda ritināšana ar cieņu pret reduced-motion
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function smoothScrollTo(target){
+      const el = typeof target === 'string' ? document.querySelector(target) : target;
+      if(!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({top, behavior: prefersReduced ? 'auto' : 'smooth'});
+    }
+
+    // Datu-scroll pogas
+    document.querySelectorAll('[data-scroll]').forEach(btn=>{
+      btn.addEventListener('click', (e)=> {
+        e.preventDefault();
+        smoothScrollTo(btn.getAttribute('data-scroll'));
+      });
+    });
+
+    // Enkuru gludā ritināšana
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        const id = a.getAttribute('href');
+        if(id.length > 1){
+          e.preventDefault();
+          smoothScrollTo(id);
+          history.replaceState(null, '', id);
+        }
+      });
+    });
+
+    // Gads kājenē
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Modāļi
+    const contactModal = document.getElementById('contact-modal');
+    const successModal = document.getElementById('success-modal');
+    const openers = [document.getElementById('open-contact'), document.getElementById('cta-open')].filter(Boolean);
+    openers.forEach(btn => btn.addEventListener('click', ()=> contactModal.showModal()));
+    document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', (e)=>{
+      const dlg = e.target.closest('dialog');
+      if(dlg) dlg.close();
+    }));
+
+    // Aizvēršana, klikšķinot fonu
+    [contactModal, successModal].forEach(dlg=>{
+      dlg.addEventListener('click', (e)=>{
+        const rect = dlg.querySelector('.modal-card').getBoundingClientRect();
+        const inDialog = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+        if(!inDialog) dlg.close();
+      });
+    });
+
+    // FORMA — validācija (bez telefona lauka, Apple vadlīnijas)
+    const form = document.getElementById('contact-form');
+    const formState = document.getElementById('form-state');
+
+    function setState(msg, ok=true){
+      formState.textContent = msg;
+      formState.style.color = ok ? 'var(--ok)' : 'var(--error)';
+    }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const message = form.message.value.trim();
+      const consent = form.querySelector('#consent').checked;
+
+      if(!name || !email || !message || !consent){
+        setState('Lūdzu, aizpildi visus obligātos laukus.', false);
+        return;
+      }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        setState('E-pasta formāts nav derīgs.', false);
+        return;
+      }
+
+      setState('Nosūtām…');
+      setTimeout(()=>{
+        setState('Gatavs! Atveram apstiprinājumu…');
+        contactModal.close();
+        successModal.showModal();
+        form.reset();
+        setTimeout(()=> setState(''), 1200);
+      }, 600);
+    });
+
+    // Īsceļš: Cmd/Ctrl + N atver formu
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'n' && (e.metaKey || e.ctrlKey)){
+        e.preventDefault();
+        contactModal.showModal();
+      }
+    });
+  </script>
+</body>
+</html>
